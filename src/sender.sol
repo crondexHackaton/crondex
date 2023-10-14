@@ -1,8 +1,9 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.15;
 
-import {IConnext} from "@connext/interfaces/core/IConnext.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import {IConnext} from "@connext/interfaces/core/IConnext.sol";
+
 
 /**
  * @title SourceGreeter
@@ -26,7 +27,6 @@ contract SourceTransfer {
   /** @notice Updates a greeting variable on the DestinationGreeter contract.
     * @param target Address of the DestinationGreeter contract.
     * @param destinationDomain The destination domain ID.
-    * @param newGreeting New greeting to update to.
     * @param relayerFee The fee offered to relayers.
     */
   function xSendToken (
