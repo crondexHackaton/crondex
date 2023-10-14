@@ -10,10 +10,22 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
-  "author": "anmol",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ahmedtra/crondex.git"
+  },
+  "author": "",
   "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ahmedtra/crondex/issues"
+  },
+  "homepage": "https://github.com/ahmedtra/crondex#readme",
   "dependencies": {
-    "@connext/interfaces": "^2.0.5"
+    "@connext/interfaces": "^2.0.5",
+    "@openzeppelin/contracts": "^5.0.0",
+    "@openzeppelin/contracts-upgradeable": "^5.0.0",
+    "dotenv": "^16.3.1",
+    "install": "^0.13.0",
+    "npm": "^10.2.0"
   }
 }
