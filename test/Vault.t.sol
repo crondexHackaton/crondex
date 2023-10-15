@@ -33,6 +33,8 @@ contract VaultTest is Test {
         vault = new CrondexVault(weth,"crondex vault WBTCJ","cvWETH", 0, 1e6 ether); // 1 million cap
         senderStrategy =
             new SenderStrategy(connextPolygon,address(vault),weth,address(receiverStrategy),polygonDomainId);
+
+        vault.initialize(address(senderStrategy));
     }
 
     modifier fundUsers() {
