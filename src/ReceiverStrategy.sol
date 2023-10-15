@@ -3,6 +3,7 @@ pragma solidity ^0.8.15;
 
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {IXReceiver} from "@connext/interfaces/core/IXReceiver.sol";
+import  "./interfaces/IReaper.sol";
 
 /**
  * @title DestinationGreeter
@@ -11,13 +12,20 @@ import {IXReceiver} from "@connext/interfaces/core/IXReceiver.sol";
 contract ReceiverStrategy is IXReceiver {
     string public greeting;
 
+    event amountReceived(uint256 _amount);
+
+    IReaperVault public strategy;
     // The token to be paid on this domain
     IERC20 public immutable token;
 
-    constructor(address _token) {
-        token = IERC20(_token);
+    constructor(address _vaultAdress) {
+        strategy = IReaperVault(_vaultAdress);
     }
 
+
+    function deposit(uint256 _amount) public {
+        strategy.deposit(_amount, address(this));
+    }
     /**
      * @notice The receiver function as required by the IXReceiver interface.
      * @dev The Connext bridge contract will call this function.
@@ -37,5 +45,9 @@ contract ReceiverStrategy is IXReceiver {
 
         // Unpack the _callData
         string memory receivedConfirmation = abi.decode(_callData, (string));
+
+        strategy.deposit(_amount);
+        
+        emit amountReceived(_amount);
     }
 }
