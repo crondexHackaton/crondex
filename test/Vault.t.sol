@@ -3,7 +3,8 @@ pragma solidity ^0.8.13;
 
 import {Test, console2} from "forge-std/Test.sol";
 import {CrondexVault} from "../src/CrondexVault.sol";
-import {Strategy} from "../src/Strategy.sol";
+import {SenderStrategy} from "../src/SenderStrategy.sol";
+import {ReceiverStrategy} from "../src/ReceiverStrategy.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 contract VaultTest is Test {
@@ -15,9 +16,11 @@ contract VaultTest is Test {
 
     address weth = 0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619;
     address connextPolygon = 0x11984dc4465481512eb5b777E44061C158CF2259;
-    address receiver = address(0x0000000000);
-    CrondexVault public vault;
-    Strategy public strategy;
+    uint32 polygonDomainId = 1886350457;
+
+    ReceiverStrategy receiverStrategy;
+    CrondexVault vault;
+    SenderStrategy senderStrategy;
 
     function setUp() public {
         // optimismFork = vm.createFork(vm.envString("OPTIMISM_RPC_URL"));
@@ -28,7 +31,8 @@ contract VaultTest is Test {
         vm.selectFork(polygonFork);
 
         vault = new CrondexVault(weth,"crondex vault WBTCJ","cvWETH", 0, 1e6 ether); // 1 million cap
-        strategy = new Strategy(connextPolygon,address(vault),weth,receiver,1886350457);
+        senderStrategy =
+            new SenderStrategy(connextPolygon,address(vault),weth,address(receiverStrategy),polygonDomainId);
     }
 
     modifier fundUsers() {
