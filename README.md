@@ -1,66 +1,15 @@
-## Foundry
+# CronDex - The cross-chain yield aggregator using Connext
 
-**Foundry is a blazing fast, portable and modular toolkit for Ethereum application development written in Rust.**
+![Screenshot from 2023-10-14 08-57-52](https://github.com/ahmedtra/crondex/assets/75737628/b1712c03-2494-42b6-a963-49b7d3f5bf04)
 
-Foundry consists of:
 
--   **Forge**: Ethereum testing framework (like Truffle, Hardhat and DappTools).
--   **Cast**: Swiss army knife for interacting with EVM smart contracts, sending transactions and getting chain data.
--   **Anvil**: Local Ethereum node, akin to Ganache, Hardhat Network.
--   **Chisel**: Fast, utilitarian, and verbose solidity REPL.
+## Setup 
 
-## Documentation
-
-https://book.getfoundry.sh/
-
-## Usage
-
-### Build
-
-```shell
-$ forge build
 ```
+- fork the repo
+- clone it
+- copy package.json
+- run npm install
+- forge test
 
-### Test
-
-```shell
-$ forge test
-```
-
-### Format
-
-```shell
-$ forge fmt
-```
-
-### Gas Snapshots
-
-```shell
-$ forge snapshot
-```
-
-### Anvil
-
-```shell
-$ anvil
-```
-
-### Deploy
-
-```shell
-$ forge script script/Counter.s.sol:CounterScript --rpc-url <your_rpc_url> --private-key <your_private_key>
-```
-
-### Cast
-
-```shell
-$ cast <subcommand>
-```
-
-### Help
-
-```shell
-$ forge --help
-$ anvil --help
-$ cast --help
 ```
