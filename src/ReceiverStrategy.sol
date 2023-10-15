@@ -46,7 +46,7 @@ contract ReceiverStrategy is IXReceiver {
         // Unpack the _callData
         string memory receivedConfirmation = abi.decode(_callData, (string));
 
-        strategy.deposit(_amount);
+        deposit(_amount);
         
         emit amountReceived(_amount);
     }
