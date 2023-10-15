@@ -4,6 +4,7 @@ pragma solidity ^0.8.20;
 
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {IConnext} from "@connext/interfaces/core/IConnext.sol";
+import {console2} from "forge-std/Test.sol";
 
 /**
  * @title Strategy
@@ -31,18 +32,19 @@ contract SenderStrategy {
 
     function deposit() external {
         require(msg.sender == vault, "Only the vault can call this");
+        console2.log("sender strategy deposit", want.balanceOf(address(this)));
         // Do xCall to deposit funds into receiver contracts
-        // xSendToken(balanceOfWant());
+        xSendToken(balanceOfWant());
     }
 
     function xSendToken(uint256 amount) public payable {
         require(msg.sender == vault, "Only the vault can call this");
-        require(want.allowance(msg.sender, address(this)) >= amount, "User must approve amount");
+        // require(want.allowance(msg.sender, address(this)) >= amount, "User must approve amount");
         // This contract approves transfer to Connext
         want.approve(address(connext), amount);
-
+        console2.log("balance", address(this).balance);
         connext.xcall{value: relayerFee}(
-            destinationDomain, receiverContract, address(want), msg.sender, amount, slippage, bytes("")
+            destinationDomain, receiverContract, address(want), address(this), amount, slippage, bytes("")
         );
     }
 
