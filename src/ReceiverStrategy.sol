@@ -38,8 +38,10 @@ contract ReceiverStrategy is IXReceiver {
         require(_asset == address(token), "Wrong asset received");
         // Enforce a cost to update the greeting
         require(_amount > 0, "Must pay at least 1 wei");
+
         console2.log("amount received: %s", _amount);
         vault.deposit(_amount, address(this)); // deposit to reaper
+
         emit amountReceived(_amount);
     }
 }
