@@ -8,7 +8,7 @@ import {IXReceiver} from "@connext/interfaces/core/IXReceiver.sol";
  * @title DestinationGreeter
  * @notice Example destination contract that stores a greeting.
  */
-contract Receiver is IXReceiver {
+contract ReceiverStrategy is IXReceiver {
     string public greeting;
 
     // The token to be paid on this domain

@@ -9,7 +9,7 @@ import {IConnext} from "@connext/interfaces/core/IConnext.sol";
  * @title Strategy
  * @notice source contract that send token to another chain.
  */
-contract Strategy {
+contract SenderStrategy {
     // The Connext contract on this domain
     IConnext public immutable connext;
     // Slippage (in BPS) for the transfer set to 100% for this example
