@@ -40,8 +40,7 @@ contract ReceiverStrategy is IXReceiver {
         require(_amount > 0, "Must pay at least 1 wei");
 
         console2.log("amount received: %s", _amount);
-        vault.deposit(_amount, address(this)); // deposit to reaper
-
+        // vault.deposit(_amount, address(this)); // deposit to reaper
         emit amountReceived(_amount);
     }
 }
