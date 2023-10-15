@@ -17,7 +17,7 @@ contract VaultTest is Test {
     address weth = 0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619;
     address wethOp = 0x4200000000000000000000000000000000000006;
     address connextPolygon = 0x11984dc4465481512eb5b777E44061C158CF2259;
-    uint32 polygonDomainId = 1886350457;
+    uint32 optimismDomainId = 1869640809;
 
     ReceiverStrategy receiverStrategy;
     CrondexVault vault;
@@ -36,7 +36,7 @@ contract VaultTest is Test {
         assertEq(vm.activeFork(), polygonFork);
         vault = new CrondexVault(weth,"crondex vault WBTCJ","cvWETH", 0, 1e6 ether); // 1 million cap
         senderStrategy =
-            new SenderStrategy(connextPolygon,address(vault),weth,address(receiverStrategy),polygonDomainId);
+            new SenderStrategy(connextPolygon,address(vault),weth,address(receiverStrategy),optimismDomainId);
 
         console2.log("sender strategy address: %s", address(senderStrategy));
         console2.log("vault address: %s", address(vault));
@@ -48,8 +48,8 @@ contract VaultTest is Test {
         deal(weth, user1, 1000e18);
         deal(address(senderStrategy), 10 ether);
         vm.startPrank(user1);
-        IERC20(weth).approve(address(vault), 1000e18);
-        vault.deposit(1000e18);
+        IERC20(weth).approve(address(vault), 10e18);
+        vault.deposit(10e18);
         vm.stopPrank();
     }
 }
