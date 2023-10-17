@@ -22,11 +22,17 @@
   "homepage": "https://github.com/ahmedtra/crondex#readme",
   "dependencies": {
     "@connext/interfaces": "^2.0.5",
+    "@emotion/react": "^11.11.1",
+    "@emotion/styled": "^11.11.0",
+    "@mui/icons-material": "^5.14.14",
+    "@mui/material": "^5.14.14",
     "@openzeppelin/contracts": "^5.0.0",
     "@openzeppelin/contracts-upgradeable": "^5.0.0",
     "cache": "^3.0.0",
     "dotenv": "^16.3.1",
     "install": "^0.13.0",
-    "npm": "^10.2.0"
+    "npm": "^10.2.0",
+    "viem": "^1.16.6",
+    "wagmi": "^1.4.4"
   }
 }
