@@ -17,6 +17,8 @@ contract ReceiverStrategy is IXReceiver {
     // The token to be paid on this domain
     IERC20 public immutable token;
 
+    string public greeting;
+
     constructor(address _vaultAdress, address _token) {
         vault = IReaperVault(_vaultAdress);
         token = IERC20(_token);
@@ -41,6 +43,11 @@ contract ReceiverStrategy is IXReceiver {
 
         console2.log("amount received: %s", _amount);
         // vault.deposit(_amount, address(this)); // deposit to reaper
+        greeting = "New greeting";
         emit amountReceived(_amount);
+    }
+
+    function getTokenBal() external view returns (uint256) {
+        return token.balanceOf(address(this));
     }
 }

@@ -1,0 +1,8 @@
+
+Basic token transfer with vault in middle 
+
+vault : https://goerli.etherscan.io/tx/0xa22fee66571981ecd6a574a59c72eca2a6b44c89c130f668460b84c78020366a
+TEST token: https://goerli.etherscan.io/address/0x7ea6eA49B0b0Ae9c5db7907d139D9Cd3439862a1#writeContract
+sender Strategy : https://goerli.etherscan.io/address/0xfe8224eb07007425181f39e3fe2ba870fa59c903
+receiver contract : https://goerli-optimism.etherscan.io/address/0xD47BB3B90bf7E82be79e53C813BBa797366dDbCE
+testTx: https://testnet.connextscan.io/tx/0xa22fee66571981ecd6a574a59c72eca2a6b44c89c130f668460b84c78020366a

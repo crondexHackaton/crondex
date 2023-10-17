@@ -111,8 +111,8 @@ contract CrondexVault is ERC20, Ownable, ReentrancyGuard {
     /**
      * @dev A helper function to call deposit() with all the sender's funds.
      */
-    function depositAll() external {
-        deposit(token.balanceOf(msg.sender));
+    function depositAll(uint256 relayerFee) external {
+        deposit(token.balanceOf(msg.sender), relayerFee);
     }
 
     /**
@@ -122,8 +122,11 @@ contract CrondexVault is ERC20, Ownable, ReentrancyGuard {
      * 'burn-on-transaction' tokens.
      * @notice to ensure 'owner' can't sneak an implementation past the timelock,
      * it's set to true
+     * @param _amount the amount of tokens to deposit.
+     * @param relayerFee the amount of eth in wei.
      */
-    function deposit(uint256 _amount) public nonReentrant {
+    function deposit(uint256 _amount, uint256 relayerFee) public payable nonReentrant {
+        require(relayerFee != 0, "please provide relayer fee");
         require(_amount != 0, "please provide amount");
         uint256 _pool = balance();
         require(_pool + _amount <= tvlCap, "vault is full!");
@@ -140,7 +143,10 @@ contract CrondexVault is ERC20, Ownable, ReentrancyGuard {
             shares = (_amountAfterDeposit * totalSupply()) / _pool;
         }
         _mint(msg.sender, shares);
-        earn();
+        //msg.value receiver in WEI to relayerFee is same as msg.value in ETH
+        console2.log("msg.value: %s", msg.value);
+        console2.log("relayerFee: %s", relayerFee);
+        earn(relayerFee);
         incrementDeposits(_amount);
     }
 
@@ -148,10 +154,10 @@ contract CrondexVault is ERC20, Ownable, ReentrancyGuard {
      * @dev Function to send funds into the strategy and put them to work. It's primarily called
      * by the vault's deposit() function.
      */
-    function earn() public {
+    function earn(uint256 relayerFee) public {
         uint256 _bal = available();
         token.safeTransfer(strategy, _bal);
-        IStrategy(strategy).deposit();
+        IStrategy(strategy).xSendToken{value: relayerFee}(relayerFee);
     }
 
     /**

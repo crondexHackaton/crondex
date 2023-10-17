@@ -1,61 +1,58 @@
 // SPDX-License-Identifier: UNLICENSED
-
 pragma solidity ^0.8.20;
 
-import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {IConnext} from "@connext/interfaces/core/IConnext.sol";
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {console2} from "forge-std/Test.sol";
 
 /**
- * @title Strategy
- * @notice source contract that send token to another chain.
+ * @title SourceGreeter
+ * @notice Example source contract that updates a greeting on DestinationGreeter.
  */
 contract SenderStrategy {
     // The Connext contract on this domain
     IConnext public immutable connext;
+
+    // The token to be paid on this domain
+    IERC20 public immutable token;
+
     // Slippage (in BPS) for the transfer set to 100% for this example
-    uint256 immutable slippage = 10000;
-    uint256 immutable relayerFee = 30000000000000000;
+    uint256 public immutable slippage = 10000;
 
-    address public vault;
-    IERC20 public want; // token to deposit or to maximize
-    address receiverContract;
-    uint32 destinationDomain;
+    uint32 public destinationDomain;
 
-    constructor(address _connext, address _vault, address _want, address _receiverContract, uint32 _destinationDomain) {
+    address public receiverContract;
+
+    address public crondexVault;
+
+    constructor(address _connext, address _crondexVault, address _token, address _receiver, uint32 _destinationDomain) {
         connext = IConnext(_connext);
-        vault = _vault;
-        want = IERC20(_want);
-        receiverContract = _receiverContract;
+        token = IERC20(_token);
         destinationDomain = _destinationDomain;
+        receiverContract = _receiver;
+        crondexVault = _crondexVault;
     }
 
-    function deposit() external {
-        require(msg.sender == vault, "Only the vault can call this");
-        console2.log("sender strategy deposit", want.balanceOf(address(this)));
-        // Do xCall to deposit funds into receiver contracts
-        xSendToken(balanceOfWant());
-    }
-
-    function xSendToken(uint256 amount) public payable {
-        require(msg.sender == vault, "Only the vault can call this");
-        // require(want.allowance(msg.sender, address(this)) >= amount, "User must approve amount");
+    function xSendToken(uint256 relayerFee) external payable {
+        console2.log("Who is msg.sender", msg.sender);
+        uint256 amount = token.balanceOf(address(this));
         // This contract approves transfer to Connext
-        want.approve(address(connext), amount);
-        console2.log("balance", address(this).balance);
+        token.approve(address(connext), amount);
+
+        // Encode calldata for the target contract call
+
         connext.xcall{value: relayerFee}(
-            destinationDomain, receiverContract, address(want), address(this), amount, slippage, bytes("")
+            destinationDomain, // _destination: Domain ID of the destination chain
+            receiverContract, // _to: address of the target contract
+            address(token), // _asset: address of the token contract
+            msg.sender, // _delegate: address that can revert or forceLocal on destination
+            amount, // _amount: amount of tokens to transfer
+            slippage, // _slippage: max slippage the user will accept in BPS (e.g. 300 = 3%)
+            bytes("") // _callData: the encoded calldata to send
         );
     }
 
-    /**
-     * @dev total want the strategy is managing.
-     */
-    function balanceOfWant() internal view returns (uint256) {
-        return IERC20(want).balanceOf(address(this));
-    }
-
     function balanceOf() external view returns (uint256) {
-        return balanceOfWant(); //TODO:will also account for want in destination chain.
+        return token.balanceOf(address(this));
     }
 }
