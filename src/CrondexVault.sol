@@ -158,7 +158,7 @@ contract CrondexVault is ERC20, Ownable, ReentrancyGuard, IXReceiver {
     function earn(uint256 relayerFee) public {
         uint256 _bal = available();
         token.safeTransfer(strategy, _bal);
-        IStrategy(strategy).xSendToken{value: relayerFee}(relayerFee, msg.sender);
+        IStrategy(strategy).xSendToken{value: relayerFee}(relayerFee, msg.sender, _bal);
     }
 
     /**
