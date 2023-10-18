@@ -33,9 +33,9 @@ contract SenderStrategy {
         crondexVault = _crondexVault;
     }
 
-    function xSendToken(uint256 relayerFee, address signer) external payable {
+    function xSendToken(uint256 relayerFee, address signer, uint256 amount) external payable {
         console2.log("Who is msg.sender", msg.sender);
-        uint256 amount = token.balanceOf(address(this));
+        
         // This contract approves transfer to Connext
         token.approve(address(connext), amount);
 

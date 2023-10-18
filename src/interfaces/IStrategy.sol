@@ -3,7 +3,7 @@ pragma solidity ^0.8.20;
 
 interface IStrategy {
     //deposits all funds into the farm
-    function xSendToken(uint256, address) external payable;
+    function xSendToken(uint256, address, uint256) external payable;
 
     //vault only - withdraws funds from the strategy
     function withdraw(uint256 _amount, address _user,uint256, uint256) external payable;

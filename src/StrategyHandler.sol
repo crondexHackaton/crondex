@@ -47,7 +47,7 @@ contract StrageyHandler is IXReceiver {
         uint256 _after = totalAmount();
         uint256 _amount = _pool - _after;
 
-        IStrategy(senderStrat).xSendToken{value: relayerFee}(relayerFee, signer);
+        IStrategy(senderStrat).xSendToken{value: relayerFee}(relayerFee, signer, _amount);
     }
 
     function totalAmount() public view returns (uint256){
