@@ -20,7 +20,7 @@ contract StrageyHandler is IXReceiver {
     using SafeERC20 for IERC20;
 
     // The strategy in use by the vault.
-    IReaperVault public reaperVault;
+     public reaperVault;
     IERC20 public token;
     address internal senderStrat;
 
@@ -32,23 +32,22 @@ contract StrageyHandler is IXReceiver {
       * @param _token the sender contract.
      */
     constructor(address _repearVault, address _sender, address _token) {
-        reaperVault = IReaperVault(_repearVault);
+        reaperVault = (_repearVault);
         senderStrat = _sender;
         token = IERC20(_token);
     }
 
-    function withdraw(uint256 amount, uint256 relayerFee) external {
+    function withdraw(uint256 amount, uint256 relayerFee, address signer) external {
         require(relayerFee != 0, "please provide relayer fee");
         require(amount != 0, "please provide amount");
         uint256 _pool = totalAmount();
         require(_pool - amount >= 0, "not enough funds");
 
-
         uint256 _shares = reaperVault.withdraw(amount, address(this), address(reaperVault));
         uint256 _after = totalAmount();
         uint256 _amount = _pool - _after;
 
-        IStrategy(senderStrat).xSendToken{value: relayerFee}(relayerFee);
+        IStrategy(senderStrat).xSendToken{value: relayerFee}(relayerFee, signer);
     }
 
     function totalAmount() public view returns (uint256){
@@ -76,7 +75,13 @@ contract StrageyHandler is IXReceiver {
        
         emit amountReceived(_amount);
 
-        reaperVault.deposit(_amount, address(this));
+        (bool deposit, address signer, uint256 amount, uint256 relayerfee) = abi.decode(_callData, (bool, address, uint256, uint256));
+        
+        if (deposit){
+            reaperVault.deposit(_amount, address(this));
+        } else {
+            withdraw(amount, relayerfee, signer)
+        }
     }
 
     function getTokenBal() external view returns (uint256) {
