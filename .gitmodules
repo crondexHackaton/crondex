@@ -7,3 +7,6 @@
 [submodule "lib/interfaces"]
 	path = lib/interfaces
 	url = https://github.com/connext/interfaces
+[submodule "lib/reaper-core"]
+	path = lib/reaper-core
+	url = https://github.com/Byte-Masons/reaper-core
