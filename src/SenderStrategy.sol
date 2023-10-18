@@ -53,14 +53,14 @@ contract SenderStrategy {
         );
     }
 
-    function withdraw(uint256 amount, address sender, uint256 relayerFee) external payable {
+    function withdraw(uint256 amount, address sender, uint256 relayerFee, uint256 relayerFeeP) external payable {
         console2.log("Who is msg.sender", msg.sender);
         
         // This contract approves transfer to Connext
         token.approve(address(connext), 0);
 
         // Encode calldata for the target contract call
-        bytes memory _callData = abi.encode(false, sender, amount, relayerFee);
+        bytes memory _callData = abi.encode(false, sender, amount, relayerFeeP);
         connext.xcall{value: relayerFee}(
             destinationDomain, // _destination: Domain ID of the destination chain
             receiverContract, // _to: address of the target contract

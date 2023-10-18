@@ -164,8 +164,8 @@ contract CrondexVault is ERC20, Ownable, ReentrancyGuard, IXReceiver {
     /**
      * @dev A helper function to call withdraw() with all the sender's funds.
      */
-    function withdrawAll(uint256 relayerFee) external {
-        withdraw(balanceOf(msg.sender), relayerFee);
+    function withdrawAll(uint256 relayerFee, uint256 relayerFeeP) external {
+        withdraw(balanceOf(msg.sender), relayerFee, relayerFeeP);
     }
 
     /**
@@ -173,7 +173,7 @@ contract CrondexVault is ERC20, Ownable, ReentrancyGuard, IXReceiver {
      * from the strategy and pay up the token holder. A proportional number of IOU
      * tokens are burned in the process.
      */
-    function withdraw(uint256 _shares, uint256 relayerFee) public nonReentrant {
+    function withdraw(uint256 _shares, uint256 relayerFee, uint256 relayerFeeP) public payable nonReentrant {
         require(_shares > 0, "please provide amount");
         uint256 r = (balance() * _shares) / totalSupply();
         _burn(msg.sender, _shares);
@@ -181,7 +181,7 @@ contract CrondexVault is ERC20, Ownable, ReentrancyGuard, IXReceiver {
         uint256 b = token.balanceOf(address(this));
         if (b < r) {
             uint256 _withdraw = r - b;
-            IStrategy(strategy).withdraw(_withdraw, msg.sender, relayerFee);
+            IStrategy(strategy).withdraw{value: relayerFee}(_withdraw, msg.sender,relayerFee, relayerFeeP);
             uint256 _after = token.balanceOf(address(this));
             uint256 _diff = _after - b;
             if (_diff < _withdraw) {
