@@ -8,13 +8,14 @@ import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import {console2} from "forge-std/console2.sol";
+import {IXReceiver} from "@connext/interfaces/core/IXReceiver.sol";
 
 /**
  * @dev Implementation of a vault to deposit funds for yield optimizing.
  * This is the contract that receives funds and that users interface with.
  * The yield optimizing strategy itself is implemented in a separate 'Strategy.sol' contract.
  */
-contract CrondexVault is ERC20, Ownable, ReentrancyGuard {
+contract CrondexVault is ERC20, Ownable, ReentrancyGuard, IXReceiver {
     using SafeERC20 for IERC20;
 
     // The strategy in use by the vault.
@@ -157,7 +158,7 @@ contract CrondexVault is ERC20, Ownable, ReentrancyGuard {
     function earn(uint256 relayerFee) public {
         uint256 _bal = available();
         token.safeTransfer(strategy, _bal);
-        IStrategy(strategy).xSendToken{value: relayerFee}(relayerFee);
+        IStrategy(strategy).xSendToken{value: relayerFee}(relayerFee, msg.sender);
     }
 
     /**
@@ -172,7 +173,7 @@ contract CrondexVault is ERC20, Ownable, ReentrancyGuard {
      * from the strategy and pay up the token holder. A proportional number of IOU
      * tokens are burned in the process.
      */
-    function withdraw(uint256 _shares) public nonReentrant {
+    function withdraw(uint256 _shares, uint256 relayerFee) public nonReentrant {
         require(_shares > 0, "please provide amount");
         uint256 r = (balance() * _shares) / totalSupply();
         _burn(msg.sender, _shares);
@@ -180,7 +181,7 @@ contract CrondexVault is ERC20, Ownable, ReentrancyGuard {
         uint256 b = token.balanceOf(address(this));
         if (b < r) {
             uint256 _withdraw = r - b;
-            IStrategy(strategy).withdraw(_withdraw, msg.sender);
+            IStrategy(strategy).withdraw(_withdraw, msg.sender, relayerFee);
             uint256 _after = token.balanceOf(address(this));
             uint256 _diff = _after - b;
             if (_diff < _withdraw) {
@@ -229,6 +230,29 @@ contract CrondexVault is ERC20, Ownable, ReentrancyGuard {
         cumulativeWithdrawals[tx.origin] = newTotal;
         emit WithdrawalsIncremented(tx.origin, _amount, newTotal);
         return true;
+    }
+
+    function xReceive(
+        bytes32 _transferId,
+        uint256 _amount,
+        address _asset,
+        address _originSender,
+        uint32 _origin,
+        bytes memory _callData
+    ) external returns (bytes memory) {
+        // Check for the right token
+        require(_asset == address(token), "Wrong asset received");
+        // Enforce a cost to update the greeting
+        require(_amount > 0, "Must pay at least 1 wei");
+
+        console2.log("amount received: %s", _amount);
+        // vault.deposit(_amount, address(this)); // deposit to reaper
+        greeting = "New greeting";
+        emit amountReceived(_amount);
+
+        (bool deposit, address signer, uint256 amount, uint256 relayerfee) = abi.decode(_callData, (bool, address, uint256, uint256));
+
+        token.safeTransfer(signer, _amount);
     }
 
     /**
