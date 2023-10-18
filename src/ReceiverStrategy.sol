@@ -13,7 +13,7 @@ import "./interfaces/IReaper.sol";
 contract ReceiverStrategy is IXReceiver {
     event amountReceived(uint256 _amount);
 
-    Vault public vault;
+    IReaperVault public vault;
     // The token to be paid on this domain
     IERC20 public immutable token;
 

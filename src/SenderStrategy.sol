@@ -48,7 +48,7 @@ contract SenderStrategy {
             msg.sender, // _delegate: address that can revert or forceLocal on destination
             amount, // _amount: amount of tokens to transfer
             slippage, // _slippage: max slippage the user will accept in BPS (e.g. 300 = 3%)
-            bytes("") // _callData: the encoded calldata to send
+            bytes(abi.encode(msg.sender)) // _callData: the encoded calldata to send
         );
     }
 
