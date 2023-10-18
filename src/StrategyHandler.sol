@@ -41,9 +41,13 @@ contract StrageyHandler is IXReceiver {
         require(relayerFee != 0, "please provide relayer fee");
         require(amount != 0, "please provide amount");
         uint256 _pool = totalAmount();
-        require(_pool - amount >= 0, "not enough funds");
+        
+        uint256 amount_to_withdraw = amount * _pool / 100;
 
-        uint256 _shares = reaperVault.withdraw(amount, address(this), address(reaperVault));
+        require(_pool - amount >= 0, "not enough funds");
+    	
+
+        uint256 _shares = reaperVault.withdraw(amount_to_withdraw, address(this), address(reaperVault));
         uint256 _after = totalAmount();
         uint256 _amount = _pool - _after;
 

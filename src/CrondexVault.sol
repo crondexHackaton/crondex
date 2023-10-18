@@ -177,17 +177,10 @@ contract CrondexVault is ERC20, Ownable, ReentrancyGuard, IXReceiver {
         require(_shares > 0, "please provide amount");
         uint256 r = (balance() * _shares) / totalSupply();
         _burn(msg.sender, _shares);
-
-        uint256 b = token.balanceOf(address(this));
-        if (b < r) {
-            uint256 _withdraw = r - b;
-            IStrategy(strategy).withdraw{value: relayerFee}(_withdraw, msg.sender,relayerFee, relayerFeeP);
-            uint256 _after = token.balanceOf(address(this));
-            uint256 _diff = _after - b;
-            if (_diff < _withdraw) {
-                r = b + _diff;
-            }
-        }
+        uint25 portion = 100 * _shares / totalSupply();
+        
+        IStrategy(strategy).withdraw{value: relayerFee}(portion, msg.sender,relayerFee, relayerFeeP);
+            
         token.safeTransfer(msg.sender, r);
         incrementWithdrawals(r);
     }
