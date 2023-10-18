@@ -164,8 +164,8 @@ contract CrondexVault is ERC20, Ownable, ReentrancyGuard, IXReceiver {
     /**
      * @dev A helper function to call withdraw() with all the sender's funds.
      */
-    function withdrawAll() external {
-        withdraw(balanceOf(msg.sender));
+    function withdrawAll(uint256 relayerFee) external {
+        withdraw(balanceOf(msg.sender), relayerFee);
     }
 
     /**
@@ -247,10 +247,8 @@ contract CrondexVault is ERC20, Ownable, ReentrancyGuard, IXReceiver {
 
         console2.log("amount received: %s", _amount);
         // vault.deposit(_amount, address(this)); // deposit to reaper
-        greeting = "New greeting";
-        emit amountReceived(_amount);
 
-        (bool deposit, address signer, uint256 amount, uint256 relayerfee) = abi.decode(_callData, (bool, address, uint256, uint256));
+        (bool dep, address signer, uint256 amount, uint256 relayerfee) = abi.decode(_callData, (bool, address, uint256, uint256));
 
         token.safeTransfer(signer, _amount);
     }

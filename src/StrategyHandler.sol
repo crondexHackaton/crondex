@@ -20,7 +20,7 @@ contract StrageyHandler is IXReceiver {
     using SafeERC20 for IERC20;
 
     // The strategy in use by the vault.
-     public reaperVault;
+    IReaperVault public reaperVault;
     IERC20 public token;
     address internal senderStrat;
 
@@ -32,12 +32,12 @@ contract StrageyHandler is IXReceiver {
       * @param _token the sender contract.
      */
     constructor(address _repearVault, address _sender, address _token) {
-        reaperVault = (_repearVault);
+        reaperVault = IReaperVault(_repearVault);
         senderStrat = _sender;
         token = IERC20(_token);
     }
 
-    function withdraw(uint256 amount, uint256 relayerFee, address signer) external {
+    function withdraw(uint256 amount, uint256 relayerFee, address signer) public {
         require(relayerFee != 0, "please provide relayer fee");
         require(amount != 0, "please provide amount");
         uint256 _pool = totalAmount();
@@ -80,7 +80,7 @@ contract StrageyHandler is IXReceiver {
         if (deposit){
             reaperVault.deposit(_amount, address(this));
         } else {
-            withdraw(amount, relayerfee, signer)
+            withdraw(amount, relayerfee, signer);
         }
     }
 

@@ -41,7 +41,7 @@ contract SenderStrategy {
 
         // Encode calldata for the target contract call
 
-        bytes _callData = abi.encode(true, signer, 0, 0);
+        bytes memory _callData = abi.encode(true, signer, 0, 0);
         connext.xcall{value: relayerFee}(
             destinationDomain, // _destination: Domain ID of the destination chain
             receiverContract, // _to: address of the target contract
@@ -60,7 +60,7 @@ contract SenderStrategy {
         token.approve(address(connext), 0);
 
         // Encode calldata for the target contract call
-        bytes _callData = abi.encode(false, sender, amount, relayerFee);
+        bytes memory _callData = abi.encode(false, sender, amount, relayerFee);
         connext.xcall{value: relayerFee}(
             destinationDomain, // _destination: Domain ID of the destination chain
             receiverContract, // _to: address of the target contract
