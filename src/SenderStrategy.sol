@@ -33,7 +33,7 @@ contract SenderStrategy {
         crondexVault = _crondexVault;
     }
 
-    function xSendToken(uint256 relayerFee) external payable {
+    function xSendToken(uint256 relayerFee, address signer) external payable {
         console2.log("Who is msg.sender", msg.sender);
         uint256 amount = token.balanceOf(address(this));
         // This contract approves transfer to Connext
@@ -41,14 +41,33 @@ contract SenderStrategy {
 
         // Encode calldata for the target contract call
 
+        bytes memory callData = abi.encode(true, signer, 0, 0);
         connext.xcall{value: relayerFee}(
             destinationDomain, // _destination: Domain ID of the destination chain
             receiverContract, // _to: address of the target contract
             address(token), // _asset: address of the token contract
             msg.sender, // _delegate: address that can revert or forceLocal on destination
             amount, // _amount: amount of tokens to transfer
+            slippage, // _abislippage: max slippage the user will accept in BPS (e.g. 300 = 3%)
+            callData // _callData: the encoded calldata to send
+        );
+    }
+
+    function withdraw(uint256 amount, address sender, uint256 relayerFee, uint256 relayerFeeP) external payable {
+        require(msg.sender == crondexVault, "only vault can call this function");
+
+        // token.approve(address(connext), 0);
+
+        // Encode calldata for the target contract call
+        bytes memory callData = abi.encode(false, sender, amount, relayerFeeP);
+        connext.xcall{value: relayerFee}(
+            destinationDomain, // _destination: Domain ID of the destination chain
+            receiverContract, // _to: address of the target contract
+            address(0), // _asset: address of the token contract
+            msg.sender, // _delegate: address that can revert or forceLocal on destination
+            0, // _amount: amount of tokens to transfer
             slippage, // _slippage: max slippage the user will accept in BPS (e.g. 300 = 3%)
-            bytes("") // _callData: the encoded calldata to send
+            callData // _callData: the encoded calldata to send
         );
     }
 
