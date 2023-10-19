@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.8.19;
+pragma solidity ^0.8.20;
 
 import "./interfaces/IStrategy.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
@@ -144,8 +144,6 @@ contract CrondexVault is ERC20, Ownable, ReentrancyGuard {
         }
         _mint(msg.sender, shares);
         //msg.value receiver in WEI to relayerFee is same as msg.value in ETH
-        console2.log("msg.value: %s", msg.value);
-        console2.log("relayerFee: %s", relayerFee);
         earn(relayerFee);
         incrementDeposits(_amount);
     }
@@ -174,10 +172,15 @@ contract CrondexVault is ERC20, Ownable, ReentrancyGuard {
      */
     function withdraw(uint256 _shares, uint256 relayerFee, uint256 relayerFeeP) public payable nonReentrant {
         require(_shares > 0, "please provide amount");
-        _burn(msg.sender, _shares);
+        uint256 r = (balance() * _shares) / totalSupply();
 
-        IStrategy(strategy).withdraw{value: relayerFee}(_shares, msg.sender, relayerFee, relayerFeeP);
-        incrementWithdrawals(_shares);
+        _burn(msg.sender, _shares);
+        uint256 portion = 100 * _shares / totalSupply();
+
+        IStrategy(strategy).withdraw{value: relayerFee}(portion, msg.sender, relayerFee, relayerFeeP);
+
+        token.safeTransfer(msg.sender, r);
+        incrementWithdrawals(r);
     }
 
     function updateDepositFee(uint256 fee) public onlyOwner {
@@ -240,6 +243,7 @@ contract CrondexVault is ERC20, Ownable, ReentrancyGuard {
             abi.decode(_callData, (bool, address, uint256, uint256));
 
         token.safeTransfer(signer, _amount);
+        incrementWithdrawals(_amount);
     }
 
     /**

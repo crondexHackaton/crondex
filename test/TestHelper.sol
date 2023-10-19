@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity 0.8.19;
+pragma solidity ^0.8.20;
 
+import {IReaperVault} from "../src/interfaces/IReaperVault.sol";
 import "forge-std/Test.sol";
 
 contract TestHelper is Test {
@@ -60,11 +61,13 @@ contract TestHelper is Test {
 
     function setUpArbitrum(uint256 blockNumber) public {
         arbitrumForkId = vm.createSelectFork(getRpc(42161), blockNumber);
+        console2.log("length", 0x508734b52BA7e04Ba068A2D4f67720Ac1f63dF47.code.length);
         vm.label(CONNEXT_ARBITRUM, "Connext Arbitrum");
     }
 
     function setUpOptimism(uint256 blockNumber) public {
         optimismForkId = vm.createSelectFork(getRpc(10), blockNumber);
+
         vm.label(CONNEXT_OPTIMISM, "Connext Optimism");
     }
 

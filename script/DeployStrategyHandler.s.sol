@@ -1,27 +1,27 @@
-// // SPDX-License-Identifier: UNLICENSED
-// pragma solidity ^0.8.19;
+// SPDX-License-Identifier: UNLICENSED
+pragma solidity ^0.8.19;
 
-// import "forge-std/Script.sol";
-// import "../src/StrategyHandler.sol";
-// import "../src/mocks/ReaperMock.sol";
-// import {console2} from "forge-std/Test.sol";
+import "forge-std/Script.sol";
+import "../src/StrategyHandler.sol";
+import "../src/mocks/ReaperMock.sol";
+import {console2} from "forge-std/Test.sol";
 
-// contract DeployReceiver is Script {
-//     function run() external returns (address) {
-//         address TEST = 0x7ea6eA49B0b0Ae9c5db7907d139D9Cd3439862a1;
-//         address connextOp = 0x5Ea1bb242326044699C3d81341c5f535d5Af1504;
+contract DeployReceiver is Script {
+    function run() external returns (address) {
+        address TEST = 0x7ea6eA49B0b0Ae9c5db7907d139D9Cd3439862a1;
+        address connextOp = 0x5Ea1bb242326044699C3d81341c5f535d5Af1504;
 
-//         uint256 deployerKey = vm.envUint("PRIVATE_KEY");
-//         uint256 desDomain = 1735353714; //goerli
-//         vm.startBroadcast(deployerKey);
-//         ReaperMock reaper = new ReaperMock();
-//         StrageyHandler handler = new StrageyHandler(address(reaper), TEST,connextOp,desDomain);
+        uint256 deployerKey = vm.envUint("PRIVATE_KEY");
+        uint32 desDomain = 1735353714; //goerli
+        vm.startBroadcast(deployerKey);
+        ReaperMock reaper = new ReaperMock();
+        StrategyHandler handler = new StrategyHandler(address(reaper), TEST,connextOp,desDomain);
 
-//     // give some fund to handler for fees
-//     deal(address(handle),10 ether);
-//         vm.stopBroadcast();
-//         console2.log("receiver address: %s", address(handler));
+        // give some fund to handler for fees
+        //   deal(address(handler), 10 ether);
+        vm.stopBroadcast();
+        console2.log("receiver address: %s", address(handler));
 
-//         return (address(handler));
-//     }
-// }
+        return (address(handler));
+    }
+}

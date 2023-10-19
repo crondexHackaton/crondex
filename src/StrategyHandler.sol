@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.8.19;
+pragma solidity ^0.8.20;
 
 import {IReaperVault} from "./interfaces/IReaperVault.sol";
 import "./interfaces/IStrategy.sol";
@@ -8,6 +8,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {console2} from "forge-std/console2.sol";
 import {IXReceiver} from "@connext/interfaces/core/IXReceiver.sol";
 
@@ -31,13 +32,13 @@ contract StrategyHandler is IXReceiver, Ownable {
 
     /**
      * @dev Initializes the  Reaper strategy handler
-     * @param _reapearVault reaper vault on optimism.
+     * @param _reaperVault reaper vault on optimism.
      * @param _token the sender contract.
      */
-    constructor(address _reapearVault, address _token, address _connext, uint32 _destinationDomain)
+    constructor(address _reaperVault, address _token, address _connext, uint32 _destinationDomain)
         Ownable(msg.sender)
     {
-        reaperVault = IReaperVault(_reapearVault);
+        reaperVault = IReaperVault(_reaperVault);
         token = IERC20(_token);
         connext = IConnext(_connext);
         destinationDomain = _destinationDomain;
@@ -52,10 +53,15 @@ contract StrategyHandler is IXReceiver, Ownable {
         require(amount != 0, "please provide amount");
         require(amount != 0, "please provide amount");
         uint256 _pool = totalAmount();
+
+        uint256 amount_to_withdraw = amount * _pool / 100;
+
         require(_pool - amount >= 0, "not enough funds");
         require(_pool - amount >= 0, "not enough funds");
 
         reaperVault.withdraw(amount, address(this), address(reaperVault));
+
+        uint256 _shares = reaperVault.withdraw(amount_to_withdraw, address(this), address(reaperVault));
         uint256 _after = totalAmount();
         uint256 _amount = _pool - _after;
         _xSendCompoundedTokens(relayerFee, _amount, signer);
@@ -75,7 +81,6 @@ contract StrategyHandler is IXReceiver, Ownable {
         uint32, /*_origin*/
         bytes memory _callData
     ) external returns (bytes memory) {
-        console2.log("calldata", string(_callData));
         (bool deposit, address signer, uint256 amount, uint256 relayerfee) =
             abi.decode(_callData, (bool, address, uint256, uint256));
 
@@ -83,7 +88,9 @@ contract StrategyHandler is IXReceiver, Ownable {
             require(_asset == address(token), "Wrong asset received");
             require(_amount > 0, "Must pay at least 1 wei");
             console2.log(address(reaperVault));
-            reaperVault.deposit(_amount, address(this));
+            token.approve(address(reaperVault), _amount);
+            // reaperVault.deposit(address(token), _amount, msg.sender, 0);
+            reaperVault.deposit(_amount);
             emit amountReceived(_amount);
         } else {
             // withdraw(amount, relayerfee, signer);
