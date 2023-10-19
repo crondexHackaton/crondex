@@ -93,7 +93,7 @@ contract StrategyHandler is IXReceiver, Ownable {
             reaperVault.deposit(_amount);
             emit amountReceived(_amount);
         } else {
-            // withdraw(amount, relayerfee, signer);
+            withdraw(amount, relayerfee, signer);
         }
     }
 
