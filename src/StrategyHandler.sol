@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity ^0.8.20;
+pragma solidity 0.8.19;
 
-import "./interfaces/IReaper.sol";
+import {IReaperVault} from "./interfaces/IReaperVault.sol";
 import "./interfaces/IStrategy.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
@@ -18,42 +18,47 @@ import {IConnext} from "@connext/interfaces/core/IConnext.sol";
  * This is the contract that receives funds and that users interface with.
  * The yield optimizing strategy itself is implemented in a separate 'Strategy.sol' contract.
  */
-contract StrageyHandler is IXReceiver {
+contract StrategyHandler is IXReceiver, Ownable {
     using SafeERC20 for IERC20;
 
     // The strategy in use by the vault.
     IReaperVault public reaperVault;
     IERC20 public token;
-    address senderStrat;
+    address public sourceVault;
     IConnext public connext;
     uint32 public destinationDomain;
     uint256 public slippage = 10000;
 
     /**
      * @dev Initializes the  Reaper strategy handler
-     * @param _repearVault reaper vault on optimism.
-     * @param _sender the sender contract.
+     * @param _reapearVault reaper vault on optimism.
      * @param _token the sender contract.
      */
-    constructor(address _repearVault, address _sender, address _token, address _connext, uint32 _destinationDomain) {
-        reaperVault = IReaperVault(_repearVault);
-        senderStrat = _sender;
+    constructor(address _reapearVault, address _token, address _connext, uint32 _destinationDomain)
+        Ownable(msg.sender)
+    {
+        reaperVault = IReaperVault(_reapearVault);
         token = IERC20(_token);
         connext = IConnext(_connext);
         destinationDomain = _destinationDomain;
     }
 
+    function initSource(address _sourceVault) external {
+        sourceVault = _sourceVault;
+    }
+
     function withdraw(uint256 amount, uint256 relayerFee, address signer) public {
         require(relayerFee != 0, "please provide relayer fee");
         require(amount != 0, "please provide amount");
+        require(amount != 0, "please provide amount");
         uint256 _pool = totalAmount();
+        require(_pool - amount >= 0, "not enough funds");
         require(_pool - amount >= 0, "not enough funds");
 
         reaperVault.withdraw(amount, address(this), address(reaperVault));
         uint256 _after = totalAmount();
         uint256 _amount = _pool - _after;
-
-        // IStrategy(senderStrat).xSendToken{value: relayerFee}(relayerFee, signer);
+        _xSendCompoundedTokens(relayerFee, _amount, signer);
     }
 
     function totalAmount() public view returns (uint256) {
@@ -63,30 +68,25 @@ contract StrageyHandler is IXReceiver {
     event amountReceived(uint256 _amount);
 
     function xReceive(
-        bytes32 _transferId,
+        bytes32, /*_transferId*/
         uint256 _amount,
         address _asset,
-        address _originSender,
-        uint32 _origin,
+        address, /*_originSender*/
+        uint32, /*_origin*/
         bytes memory _callData
     ) external returns (bytes memory) {
-        // Check for the right token
-        require(_asset == address(token), "Wrong asset received");
-        // Enforce a cost to update the greeting
-        require(_amount > 0, "Must pay at least 1 wei");
-
-        console2.log("amount received: %s", _amount);
-        // vault.deposit(_amount, address(this)); // deposit to reaper
-
-        emit amountReceived(_amount);
-
+        console2.log("calldata", string(_callData));
         (bool deposit, address signer, uint256 amount, uint256 relayerfee) =
             abi.decode(_callData, (bool, address, uint256, uint256));
 
         if (deposit) {
+            require(_asset == address(token), "Wrong asset received");
+            require(_amount > 0, "Must pay at least 1 wei");
+            console2.log(address(reaperVault));
             reaperVault.deposit(_amount, address(this));
+            emit amountReceived(_amount);
         } else {
-            withdraw(amount, relayerfee, signer);
+            // withdraw(amount, relayerfee, signer);
         }
     }
 
@@ -94,15 +94,16 @@ contract StrageyHandler is IXReceiver {
         return token.balanceOf(address(this));
     }
 
-    function _xSendCompondedTokens(uint256 relayerFee, uint256 amount, address _target) internal {
+    function _xSendCompoundedTokens(uint256 relayerFee, uint256 amount, address signer) internal {
+        bytes memory callData = abi.encode(amount, signer);
         connext.xcall{value: relayerFee}(
             destinationDomain, // _destination: Domain ID of the destination chain
-            senderStrat, // _to: address of the target contract
+            sourceVault, // _to: address of the target contract
             address(token), // _asset: address of the token contract
             msg.sender, // _delegate: address that can revert or forceLocal on destination
             amount, // _amount: amount of tokens to transfer
             slippage, // _slippage: max slippage the user will accept in BPS (e.g. 300 = 3%)
-            bytes("") // _callData: the encoded calldata to send
+            callData // _callData: the encoded calldata to send
         );
     }
 }

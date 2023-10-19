@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity ^0.8.20;
+pragma solidity 0.8.19;
 
 import "./interfaces/IStrategy.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import {console2} from "forge-std/console2.sol";
 
 /**
@@ -157,14 +157,14 @@ contract CrondexVault is ERC20, Ownable, ReentrancyGuard {
     function earn(uint256 relayerFee) public {
         uint256 _bal = available();
         token.safeTransfer(strategy, _bal);
-        IStrategy(strategy).xSendToken{value: relayerFee}(relayerFee);
+        IStrategy(strategy).xSendToken{value: relayerFee}(relayerFee, msg.sender);
     }
 
     /**
      * @dev A helper function to call withdraw() with all the sender's funds.
      */
-    function withdrawAll() external {
-        withdraw(balanceOf(msg.sender));
+    function withdrawAll(uint256 relayerFee, uint256 relayerFeeP) external {
+        withdraw(balanceOf(msg.sender), relayerFee, relayerFeeP);
     }
 
     /**
@@ -172,23 +172,12 @@ contract CrondexVault is ERC20, Ownable, ReentrancyGuard {
      * from the strategy and pay up the token holder. A proportional number of IOU
      * tokens are burned in the process.
      */
-    function withdraw(uint256 _shares) public nonReentrant {
+    function withdraw(uint256 _shares, uint256 relayerFee, uint256 relayerFeeP) public payable nonReentrant {
         require(_shares > 0, "please provide amount");
-        uint256 r = (balance() * _shares) / totalSupply();
         _burn(msg.sender, _shares);
 
-        uint256 b = token.balanceOf(address(this));
-        if (b < r) {
-            uint256 _withdraw = r - b;
-            IStrategy(strategy).withdraw(_withdraw, msg.sender);
-            uint256 _after = token.balanceOf(address(this));
-            uint256 _diff = _after - b;
-            if (_diff < _withdraw) {
-                r = b + _diff;
-            }
-        }
-        token.safeTransfer(msg.sender, r);
-        incrementWithdrawals(r);
+        IStrategy(strategy).withdraw{value: relayerFee}(_shares, msg.sender, relayerFee, relayerFeeP);
+        incrementWithdrawals(_shares);
     }
 
     function updateDepositFee(uint256 fee) public onlyOwner {
@@ -229,6 +218,28 @@ contract CrondexVault is ERC20, Ownable, ReentrancyGuard {
         cumulativeWithdrawals[tx.origin] = newTotal;
         emit WithdrawalsIncremented(tx.origin, _amount, newTotal);
         return true;
+    }
+
+    function xReceive(
+        bytes32, /*_transferId*/
+        uint256 _amount,
+        address _asset,
+        address, /*_originSender*/
+        uint32, /*_origin*/
+        bytes memory _callData
+    ) external returns (bytes memory) {
+        // Check for the right token
+        require(_asset == address(token), "Wrong asset received");
+        // Enforce a cost to update the greeting
+        require(_amount > 0, "Must pay at least 1 wei");
+
+        console2.log("amount received: %s", _amount);
+        // vault.deposit(_amount, address(this)); // deposit to reaper
+
+        (bool deposit, address signer, uint256 amount, uint256 relayerfee) =
+            abi.decode(_callData, (bool, address, uint256, uint256));
+
+        token.safeTransfer(signer, _amount);
     }
 
     /**
