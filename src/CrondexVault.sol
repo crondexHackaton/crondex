@@ -177,7 +177,7 @@ contract CrondexVault is ERC20, Ownable, ReentrancyGuard, IXReceiver {
         require(_shares > 0, "please provide amount");
         uint256 r = (balance() * _shares) / totalSupply();
         _burn(msg.sender, _shares);
-        uint25 portion = 100 * _shares / totalSupply();
+        uint256 portion = 100 * _shares / totalSupply();
         
         IStrategy(strategy).withdraw{value: relayerFee}(portion, msg.sender,relayerFee, relayerFeeP);
             
@@ -244,6 +244,7 @@ contract CrondexVault is ERC20, Ownable, ReentrancyGuard, IXReceiver {
         (bool dep, address signer, uint256 amount, uint256 relayerfee) = abi.decode(_callData, (bool, address, uint256, uint256));
 
         token.safeTransfer(signer, _amount);
+        incrementWithdrawals(_amount);
     }
 
     /**
