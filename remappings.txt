@@ -1,14 +1,2 @@
 @connext/=node_modules/@connext/
-@openzeppelin/=node_modules/@openzeppelin/
-@openzeppelin/contracts/=lib/openzeppelin-contracts/contracts/
-connext-integration/=lib/connext-integration/contracts/
-connext-interfaces/=lib/connext-integration/lib/connext-interfaces/
-ds-test/=lib/forge-std/lib/ds-test/src/
-erc4626-tests/=lib/openzeppelin-contracts/lib/erc4626-tests/
-forge-std/=lib/forge-std/src/
-interfaces/=lib/interfaces/
-openzeppelin-contracts-upgradeable/=lib/connext-integration/lib/openzeppelin-contracts-upgradeable/
-openzeppelin-contracts/=lib/openzeppelin-contracts/
-openzeppelin/=lib/connext-integration/lib/openzeppelin-contracts-upgradeable/contracts/
-reaper-core/=lib/reaper-core/contracts/
-vulcan/=lib/connext-integration/lib/vulcan/src/
+@openzeppelin/=lib/openzeppelin-contracts/

@@ -11,7 +11,7 @@ contract DeploySender is Script {
     function run() external returns (address, address) {
         address TEST = 0x7ea6eA49B0b0Ae9c5db7907d139D9Cd3439862a1;
         address connext_goerli = 0xFCa08024A6D4bCc87275b1E4A1E22B71fAD7f649;
-        address handler = 0xD47BB3B90bf7E82be79e53C813BBa797366dDbCE; //update
+        address handler = 0x0611AfEf7A31981d087E5afD3469189234d86060; //update
         uint32 destDomain = 1735356532;
         uint256 deployerKey = vm.envUint("PRIVATE_KEY");
         vm.startBroadcast(deployerKey);
