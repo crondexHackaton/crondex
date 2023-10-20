@@ -62,27 +62,28 @@ contract VaultTest is TestHelper {
     }
 
     function test_withdraw() public {
-        utils_setUpDestination();
-        utils_setUpOrigin();
+        // utils_setUpDestination();
+        // utils_setUpOrigin();
 
-        vm.selectFork(arbitrumForkId);
-        assertEq(vm.activeFork(), arbitrumForkId);
-        IERC20(ARB_USDC).approve(address(vault), 100e6); //
-        vault.deposit{value: 0.03 ether}(100e6, 0.03 ether);
-        assertEq(vault.balanceOf(address(this)), 100e6);
-        vm.makePersistent(address(vault));
+        // vm.selectFork(arbitrumForkId);
+        // assertEq(vm.activeFork(), arbitrumForkId);
+        // IERC20(ARB_USDC).approve(address(vault), 100e6); //
+        // vault.deposit{value: 0.03 ether}(100e6, 0.03 ether);
+        // assertEq(vault.balanceOf(address(this)), 100e6);
+        // vm.makePersistent(address(vault));
 
-        //sending 10 token
-        vm.selectFork(optimismForkId);
-        assertEq(vm.activeFork(), optimismForkId);
-        handler.initSource(address(vault));
-        deal(OP_USDC, address(handler), 100e6);
-        vm.prank(CONNEXT_OPTIMISM);
-        bytes memory _callData = abi.encode(true, address(this), 0, 0);
+        // //sending 10 token
+        // vm.selectFork(optimismForkId);
+        // assertEq(vm.activeFork(), optimismForkId);
+        // handler.initSource(address(vault));
+        // deal(OP_USDC, address(handler), 100e6);
+        // vm.prank(CONNEXT_OPTIMISM);
+        // bytes memory _callData = abi.encode(true, address(this), 0, 0);
 
-        handler.xReceive(bytes32(""), 100e6, OP_USDC, address(0), 123, _callData);
-        assertEq(IERC20(reaperUsdcVault).balanceOf(address(handler)), 95482403);
-        // vm.makePersistent(address(reaperUsdcVault));
+        // handler.xReceive(bytes32(""), 100e6, OP_USDC, address(0), 123, _callData);
+        // assertEq(IERC20(reaperUsdcVault).balanceOf(address(handler)), 95482403);
+        // // vm.makePersistent(address(reaperUsdcVault));
+        test_deposit();
 
         //withdraw
         vm.selectFork(arbitrumForkId);
@@ -96,9 +97,9 @@ contract VaultTest is TestHelper {
         deal(address(handler), 10 ether);
         console2.log("Reaper token bal ", IERC20(reaperUsdcVault).balanceOf(address(handler)));
         IERC20(reaperUsdcVault).approve(address(handler), 95482403);
-        bytes memory _callData2 = abi.encode(false, address(this), 95482403, 0.03 ether);
+        bytes memory _callData2 = abi.encode(false, address(this), 100e6, 0.03 ether);
         vm.prank(CONNEXT_OPTIMISM);
-        handler.xReceive(bytes32(""), 95482403, OP_USDC, address(0), 123, _callData2);
+        handler.xReceive(bytes32(""), 100e6, OP_USDC, address(0), 123, _callData2);
         assertEq(IERC20(reaperUsdcVault).balanceOf(address(handler)), 4313509);
     }
 }
