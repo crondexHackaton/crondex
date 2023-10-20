@@ -172,15 +172,18 @@ contract CrondexVault is ERC20, Ownable, ReentrancyGuard {
      */
     function withdraw(uint256 _shares, uint256 relayerFee, uint256 relayerFeeP) public payable nonReentrant {
         require(_shares > 0, "please provide amount");
-        uint256 r = (balance() * _shares) / totalSupply();
+        console2.log("shares: %s", _shares);
+        // uint256 r = (balance() * _shares) / totalSupply();
 
+        // uint256 portion = 100 * _shares / totalSupply();
         _burn(msg.sender, _shares);
-        uint256 portion = 100 * _shares / totalSupply();
+        // console2.log("portion: %s", portion);
 
-        IStrategy(strategy).withdraw{value: relayerFee}(portion, msg.sender, relayerFee, relayerFeeP);
-
-        token.safeTransfer(msg.sender, r);
-        incrementWithdrawals(r);
+        IStrategy(strategy).withdraw{value: relayerFee}(_shares, msg.sender, relayerFee, relayerFeeP);
+        // if (r > 0) {
+        //     token.safeTransfer(msg.sender, r);
+        //     incrementWithdrawals(r);
+        // }
     }
 
     function updateDepositFee(uint256 fee) public onlyOwner {

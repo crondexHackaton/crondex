@@ -61,7 +61,6 @@ contract TestHelper is Test {
 
     function setUpArbitrum(uint256 blockNumber) public {
         arbitrumForkId = vm.createSelectFork(getRpc(42161), blockNumber);
-        console2.log("length", 0x508734b52BA7e04Ba068A2D4f67720Ac1f63dF47.code.length);
         vm.label(CONNEXT_ARBITRUM, "Connext Arbitrum");
     }
 
