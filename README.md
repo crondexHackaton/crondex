@@ -1,7 +1,6 @@
-# CronDex - The cross-chain yield aggregator using Connext
+# CronDex - The cross-chain yield aggregator using Connext for Gnosis users
 
-![Screenshot from 2023-10-14 08-57-52](https://github.com/ahmedtra/crondex/assets/75737628/b1712c03-2494-42b6-a963-49b7d3f5bf04)
-
+![image](https://github.com/pokhrelanmol/crondex/assets/75737628/66cb0e98-725b-45a4-be0c-e6b54b8fed6d)
 
 ## Setup 
 
