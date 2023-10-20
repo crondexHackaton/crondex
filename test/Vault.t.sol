@@ -98,7 +98,7 @@ contract VaultTest is TestHelper {
         // deal(OP_USDC, address(reaperUsdcVault), 10e6);
         console2.log("Reaper token bal ", IERC20(reaperUsdcVault).balanceOf(address(handler)));
         IERC20(reaperUsdcVault).approve(address(handler), 95482403);
-        bytes memory _callData2 = abi.encode(false, address(this), 100e6, 0.03 ether);
+        bytes memory _callData2 = abi.encode(false, address(this), 10e6, 0.03 ether);
         vm.prank(CONNEXT_OPTIMISM);
         handler.xReceive(bytes32(""), 100e6, OP_USDC, address(0), 123, _callData2);
         assertEq(IERC20(reaperUsdcVault).balanceOf(address(handler)), 4313509);

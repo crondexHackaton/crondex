@@ -73,4 +73,8 @@ contract SenderStrategy {
     function balanceOf() external view returns (uint256) {
         return token.balanceOf(address(this));
     }
+
+    function setReceiver(address _receiver) external {
+        receiverContract = _receiver;
+    }
 }

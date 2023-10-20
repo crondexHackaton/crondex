@@ -9,7 +9,7 @@ import {console2} from "forge-std/Test.sol";
 
 contract DeployStrategyHandler is Script {
     function run() external returns (address) {
-        address TEST = 0x7ea6eA49B0b0Ae9c5db7907d139D9Cd3439862a1;
+        address TEST = 0x68Db1c8d85C09d546097C65ec7DCBFF4D6497CbF;
         address connextOp = 0x5Ea1bb242326044699C3d81341c5f535d5Af1504;
 
         uint256 deployerKey = vm.envUint("PRIVATE_KEY");

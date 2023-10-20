@@ -24,7 +24,7 @@ interface IReaperVault {
 
     function previewWithdraw(uint256 assets) external view returns (uint256 shares);
 
-    function withdraw(uint256 assets, address receiver, address owner) external returns (uint256 shares);
+    function withdraw(uint256 assets) external returns (uint256 shares);
 
     function maxRedeem(address owner) external view returns (uint256 maxShares);
 
