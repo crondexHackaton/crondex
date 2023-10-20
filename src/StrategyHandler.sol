@@ -57,7 +57,8 @@ contract StrategyHandler is IXReceiver, Ownable {
         // require(_pool - amount >= 0, "not enough funds");
 
         // reaperVault.withdraw(amount_to_withdraw, address(this), address(reaperVault));
-        reaperVault.withdraw(amount, address(this), address(this));
+        uint256 actualShares = reaperVault.convertToShares(amount);
+        reaperVault.withdraw(actualShares, address(this), address(this));
         // uint256 _after = totalAmount();
         // uint256 _amount = _pool - _after;
         uint256 _amount = token.balanceOf(address(this));
