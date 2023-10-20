@@ -51,14 +51,18 @@ contract StrategyHandler is IXReceiver, Ownable {
     function withdraw(uint256 amount, uint256 relayerFee, address signer) public {
         require(relayerFee != 0, "please provide relayer fee");
         require(amount != 0, "please provide amount");
-        uint256 _pool = totalAmount(); //TDDO: error here check tomorow
-        uint256 amount_to_withdraw = amount * _pool / 100;
+        // uint256 _pool = totalAmount(); //TDDO: error here check tomorow
+        // uint256 amount_to_withdraw = amount * _pool / 100;
 
-        require(_pool - amount >= 0, "not enough funds");
+        // require(_pool - amount >= 0, "not enough funds");
 
-        reaperVault.withdraw(amount_to_withdraw, address(this), address(reaperVault));
-        uint256 _after = totalAmount();
-        uint256 _amount = _pool - _after;
+        // reaperVault.withdraw(amount_to_withdraw, address(this), address(reaperVault));
+        reaperVault.withdraw(amount, address(this), address(this));
+        // uint256 _after = totalAmount();
+        // uint256 _amount = _pool - _after;
+        uint256 _amount = token.balanceOf(address(this));
+
+        console2.log("amount with handler", _amount);
         _xSendCompoundedTokens(relayerFee, _amount, signer);
     }
 
@@ -85,6 +89,7 @@ contract StrategyHandler is IXReceiver, Ownable {
             console2.log(address(reaperVault));
             token.approve(address(reaperVault), _amount);
             // reaperVault.deposit(address(token), _amount);
+            console2.log("amount", _amount);
             reaperVault.deposit(_amount);
             emit amountReceived(_amount);
         } else {
@@ -98,6 +103,7 @@ contract StrategyHandler is IXReceiver, Ownable {
 
     function _xSendCompoundedTokens(uint256 relayerFee, uint256 amount, address signer) internal {
         bytes memory callData = abi.encode(amount, signer);
+        token.approve(address(connext), amount);
         connext.xcall{value: relayerFee}(
             destinationDomain, // _destination: Domain ID of the destination chain
             sourceVault, // _to: address of the target contract

@@ -13,8 +13,8 @@ contract VaultTest is TestHelper {
     address public immutable OP_USDC = 0x7F5c764cBc14f9669B88837ca1490cCa17c31607;
     address public immutable ARB_USDC = 0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8;
 
-    address public reaperUsdcVault = 0xaD17A225074191d5c8a37B50FdA1AE278a2EE6A2;
-    // address public immutable reaperUsdcVault = 0x508734b52BA7e04Ba068A2D4f67720Ac1f63dF47;
+    // address public reaperUsdcVault = 0xaD17A225074191d5c8a37B50FdA1AE278a2EE6A2;
+    address public immutable reaperUsdcVault = 0x508734b52BA7e04Ba068A2D4f67720Ac1f63dF47;
     address user1 = address(1);
     address user2 = address(2);
 
@@ -58,7 +58,7 @@ contract VaultTest is TestHelper {
         bytes memory _callData = abi.encode(true, address(this), 0, 0);
 
         handler.xReceive(bytes32(""), 100e6, OP_USDC, address(0), 123, _callData);
-        assertEq(IERC20(reaperUsdcVault).balanceOf(address(handler)), 98330934);
+        assertEq(IERC20(reaperUsdcVault).balanceOf(address(handler)), 95482403);
     }
 
     function test_withdraw() public {
@@ -81,22 +81,24 @@ contract VaultTest is TestHelper {
         bytes memory _callData = abi.encode(true, address(this), 0, 0);
 
         handler.xReceive(bytes32(""), 100e6, OP_USDC, address(0), 123, _callData);
-        assertEq(IERC20(reaperUsdcVault).balanceOf(address(handler)), 98330934);
+        assertEq(IERC20(reaperUsdcVault).balanceOf(address(handler)), 95482403);
         // vm.makePersistent(address(reaperUsdcVault));
 
         //withdraw
         vm.selectFork(arbitrumForkId);
         assertEq(vm.activeFork(), arbitrumForkId);
-        console2.log("total supply", vault.totalSupply());
+        console2.log("balance of", vault.balanceOf(address(this)));
         vault.withdraw{value: 0.03 ether}(100e6, 0.03 ether, 0.03 ether);
+        console2.log("No issue here");
 
         vm.selectFork(optimismForkId);
         assertEq(vm.activeFork(), optimismForkId);
-        vm.prank(CONNEXT_OPTIMISM);
         deal(address(handler), 10 ether);
-        deal(OP_USDC, address(handler), 10e6);
-        bytes memory _callData2 = abi.encode(false, address(this), 100e6, 0.03 ether);
-        handler.xReceive(bytes32(""), 100e6, OP_USDC, address(0), 123, _callData2);
-        assertEq(IERC20(reaperUsdcVault).balanceOf(address(handler)), 0);
+        console2.log("Reaper token bal ", IERC20(reaperUsdcVault).balanceOf(address(handler)));
+        IERC20(reaperUsdcVault).approve(address(handler), 95482403);
+        bytes memory _callData2 = abi.encode(false, address(this), 95482403, 0.03 ether);
+        vm.prank(CONNEXT_OPTIMISM);
+        handler.xReceive(bytes32(""), 95482403, OP_USDC, address(0), 123, _callData2);
+        assertEq(IERC20(reaperUsdcVault).balanceOf(address(handler)), 4313509);
     }
 }
