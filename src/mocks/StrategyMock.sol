@@ -50,7 +50,8 @@ contract StrategyMock is Ownable {
      */
     function withdraw(uint256 _amount) external {
         require(msg.sender == vault, "!vault");
-        uint256 currBal = _balanceOfWant();
+        uint256 currBal = balanceOf();
+        IERC20Extented(want).safeTransfer(vault, _amount);
     }
     /* --------------------------- INTERNAL FUNCTIONS --------------------------- */
 
@@ -62,7 +63,7 @@ contract StrategyMock is Ownable {
     }
 
     function _earned() internal view returns (uint256) {
-        return 10e6;
+        return 0;
         // Normalize to 8 decimals
     }
 

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.18;
+pragma solidity ^0.8.20;
 
 interface IReaperVault {
     function asset() external view returns (address assetTokenAddress);
@@ -24,7 +24,7 @@ interface IReaperVault {
 
     function previewWithdraw(uint256 assets) external view returns (uint256 shares);
 
-    function withdraw(uint256 assets) external returns (uint256 shares);
+    function withdraw(uint256 assets, address owner, address receiver) external returns (uint256 shares);
 
     function maxRedeem(address owner) external view returns (uint256 maxShares);
 

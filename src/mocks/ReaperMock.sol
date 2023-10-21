@@ -1035,11 +1035,6 @@ contract ReaperMock is ERC20, Ownable, ReentrancyGuard {
         constructionTime = block.timestamp;
     }
 
-    function convertToShares(uint256 amount) external returns(uint256){
-        
-        return amount / (balance() + 1) * totalSupply();
-    }
-
     /**
      * @dev Connects the vault to its initial strategy. One use only.
      * @notice deployer has only 20 minutes after construction to connect the initial strategy.
@@ -1139,32 +1134,25 @@ contract ReaperMock is ERC20, Ownable, ReentrancyGuard {
     /**
      * @dev A helper function to call withdraw() with all the sender's funds.
      */
-    function withdrawAll() external {
-        withdraw(balanceOf(msg.sender));
-    }
+    // function withdrawAll() external {
+    //     withdraw(balanceOf(msg.sender), msg.sender, msg.sender);
+    // }
 
     /**
      * @dev Function to exit the system. The vault will withdraw the required tokens
      * from the strategy and pay up the token holder. A proportional number of IOU
      * tokens are burned in the process.
      */
-    function withdraw(uint256 _shares) public nonReentrant {
+    function withdraw(uint256 _shares, address receiver, address owner) external nonReentrant returns (uint256) {
         require(_shares > 0, "please provide amount");
-        uint256 r = (balance().mul(_shares)).div(totalSupply());
-        _burn(msg.sender, _shares);
+        _burn(receiver, _shares);
 
-        uint256 b = token.balanceOf(address(this));
-        if (b < r) {
-            uint256 _withdraw = r.sub(b);
-            IStrategy(strategy).withdraw(_withdraw);
-            uint256 _after = token.balanceOf(address(this));
-            uint256 _diff = _after.sub(b);
-            if (_diff < _withdraw) {
-                r = b.add(_diff);
-            }
-        }
-        token.safeTransfer(msg.sender, r);
-        incrementWithdrawals(r);
+        uint256 r = balance();
+
+        IStrategy(strategy).withdraw(_shares);
+        token.safeTransfer(receiver, _shares);
+        incrementWithdrawals(_shares);
+        return _shares;
     }
 
     /**
@@ -1227,4 +1215,9 @@ contract ReaperMock is ERC20, Ownable, ReentrancyGuard {
         uint256 amount = IERC20(_token).balanceOf(address(this));
         IERC20(_token).safeTransfer(msg.sender, amount);
     }
+
+    // function convertToShares(uint256 amount) external returns (uint256) {
+    //     uint256 _shares = 100 * amount / totalSupply();
+    //     return _shares;
+    // }
 }
