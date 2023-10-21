@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.18;
+pragma solidity ^0.8.20;
 
 import {console2} from "forge-std/Test.sol";
 import {CrondexVault} from "../src/CrondexVault.sol";
@@ -94,17 +94,21 @@ contract VaultTest is TestHelper {
 
         vm.selectFork(optimismForkId);
         assertEq(vm.activeFork(), optimismForkId);
-        deal(address(handler), 10 ether);
+        deal(address(handler), 100 ether);
         // deal(OP_USDC, address(reaperUsdcVault), 10e6);
         console2.log("Reaper token bal ", IERC20(reaperUsdcVault).balanceOf(address(handler)));
-        IERC20(reaperUsdcVault).approve(address(handler), 95482403);
-        bytes memory _callData2 = abi.encode(false, address(this), 10e6, 0.03 ether);
+        bytes memory _callData2 = abi.encode(false, address(this), 100e6, 0.03 ether);
+
         vm.prank(CONNEXT_OPTIMISM);
         handler.xReceive(bytes32(""), 100e6, OP_USDC, address(0), 123, _callData2);
         assertEq(IERC20(reaperUsdcVault).balanceOf(address(handler)), 4313509);
+
         vm.selectFork(arbitrumForkId);
         assertEq(vm.activeFork(), arbitrumForkId);
+        bytes memory _callData3 = abi.encode(95482403, address(this));
+        deal(ARB_USDC, address(vault), 95482403);
+        vault.xReceive(bytes32(""), 95482403, ARB_USDC, address(0), 123, _callData2);
         assertEq(vault.balanceOf(address(this)), 0);
-        // assertEq(IERC20(ARB_USDC).balanceOf(address(this)), 106e6);
+        assertEq(IERC20(ARB_USDC).balanceOf(address(this)), 95482403);
     }
 }

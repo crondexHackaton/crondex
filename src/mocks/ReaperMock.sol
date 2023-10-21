@@ -1035,11 +1035,6 @@ contract ReaperMock is ERC20, Ownable, ReentrancyGuard {
         constructionTime = block.timestamp;
     }
 
-    function convertToShares(uint256 amount) external returns(uint256){
-        
-        return amount / (balance() + 1) * totalSupply();
-    }
-
     /**
      * @dev Connects the vault to its initial strategy. One use only.
      * @notice deployer has only 20 minutes after construction to connect the initial strategy.
@@ -1226,5 +1221,10 @@ contract ReaperMock is ERC20, Ownable, ReentrancyGuard {
 
         uint256 amount = IERC20(_token).balanceOf(address(this));
         IERC20(_token).safeTransfer(msg.sender, amount);
+    }
+
+    function convertToShares(uint256 amount) external returns (uint256) {
+        uint256 _shares = 100 * amount / totalSupply();
+        return _shares;
     }
 }

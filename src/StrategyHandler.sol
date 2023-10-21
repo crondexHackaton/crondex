@@ -43,8 +43,8 @@ contract StrategyHandler is IXReceiver, Ownable {
         connext = IConnext(_connext);
         destinationDomain = _destinationDomain;
     }
-    
-    receive() external payable{}
+
+    receive() external payable {}
 
     function initSource(address _sourceVault) external {
         sourceVault = _sourceVault;
@@ -59,8 +59,10 @@ contract StrategyHandler is IXReceiver, Ownable {
         // require(_pool - amount >= 0, "not enough funds");
 
         // reaperVault.withdraw(amount_to_withdraw, address(this), address(reaperVault));
-        // uint256 actualShares = reaperVault.convertToShares(amount);
-        reaperVault.withdraw(amount);
+        uint256 actualShares = reaperVault.convertToShares(amount);
+        console2.log("actual shares", actualShares);
+        console2.log("shares ", reaperVault.balanceOf(address(this)));
+        reaperVault.withdraw(actualShares, address(this), address(this));
         // uint256 _after = totalAmount();
         // uint256 _amount = _pool - _after;
         uint256 _amount = token.balanceOf(address(this));
