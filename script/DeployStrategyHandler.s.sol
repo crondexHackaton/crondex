@@ -18,7 +18,7 @@ contract DeployStrategyHandler is Script {
         ReaperMock reaper = new ReaperMock(TEST, "reaper", "reaper", 1 weeks);
         StrategyMock strategy = new StrategyMock(address(reaper),TEST);
         reaper.initialize(address(strategy));
-        StrategyHandler handler = new StrategyHandler(address(reaper), TEST,connextOp,desDomain);
+        StrategyHandler handler = new StrategyHandler(address(reaper),TEST,connextOp,desDomain);
 
         // give some fund to handler for fees
         //   deal(address(handler), 10 ether);

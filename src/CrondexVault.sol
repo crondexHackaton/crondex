@@ -137,11 +137,7 @@ contract CrondexVault is ERC20, Ownable, ReentrancyGuard {
         _amount = _after - _before;
         uint256 _amountAfterDeposit = (_amount * (PERCENT_DIVISOR - depositFee)) / PERCENT_DIVISOR;
         uint256 shares = 0;
-        if (totalSupply() == 0) {
-            shares = _amountAfterDeposit;
-        } else {
-            shares = (_amountAfterDeposit * totalSupply()) / _pool;
-        }
+        shares = _amountAfterDeposit;
         _mint(msg.sender, shares);
         //msg.value receiver in WEI to relayerFee is same as msg.value in ETH
         earn(relayerFee);

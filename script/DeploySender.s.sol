@@ -11,12 +11,12 @@ contract DeploySender is Script {
     function run() external returns (address, address) {
         address TEST = 0x7ea6eA49B0b0Ae9c5db7907d139D9Cd3439862a1;
         address connext_goerli = 0xFCa08024A6D4bCc87275b1E4A1E22B71fAD7f649;
-        address handler = 0x883f43a32ad5226072B0E0E6ec8FE617fD93Ad7a; //update
+        address handler = 0x741D9e01ad9cdE1C2A0De58d2AfC7b0a6dfac2B0; //update
         uint32 destDomain = 1735356532;
         uint256 deployerKey = vm.envUint("PRIVATE_KEY");
         vm.startBroadcast(deployerKey);
 
-        CrondexVault crondexVault = new CrondexVault(TEST,"crondex vault DAI", "cvDAI", 0, 1e6 ether);
+        CrondexVault crondexVault = new CrondexVault(TEST,"crondex vault TEST", "cvTEST", 0, 10000e6 ether);
         SenderStrategy senderStrategy =
             new SenderStrategy(connext_goerli,address(crondexVault), TEST,handler, destDomain);
 

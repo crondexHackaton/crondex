@@ -59,15 +59,18 @@ contract StrategyHandler is IXReceiver, Ownable {
         // require(_pool - amount >= 0, "not enough funds");
 
         // reaperVault.withdraw(amount_to_withdraw, address(this), address(reaperVault));
-        uint256 actualShares = reaperVault.convertToShares(amount);
+        // uint256 actualShares = reaperVault.convertToShares(amount);
+        uint256 actualShares = amount;
         console2.log("actual shares", actualShares);
         console2.log("shares ", reaperVault.balanceOf(address(this)));
         reaperVault.withdraw(actualShares, address(this), address(this));
-        // uint256 _after = totalAmount();
-        // uint256 _amount = _pool - _after;
-        uint256 _amount = token.balanceOf(address(this));
 
-        console2.log("amount with handler", _amount);
+        console2.log("withdraw Success fuck this");
+        uint256 _amount = token.balanceOf(address(this));
+        if (_amount < amount) {
+            console2.log("token is lesss", _amount);
+            revert("Bal is less than requested");
+        }
         _xSendCompoundedTokens(relayerFee, _amount, signer);
     }
 
